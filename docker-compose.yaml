@@ -1,0 +1,9 @@
+services:
+  uvicorn-service:
+    build: .
+    container_name: uvicorn_service
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    volumes:
+      - ./app:/app
