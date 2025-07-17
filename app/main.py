@@ -1,11 +1,22 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from pick_regno import pick_regno
+from catboost import CatBoostClassifier
 import traceback
 
 
-MODEL_PATH = 'micromodel.cbm'
+MODEL_PATH = "micromodel.cbm"
 app = FastAPI()
+
+@app.on_event("startup")
+def load_model():
+    """
+    Загружаем CatBoost модель один раз при старте приложения.
+    """
+    model = CatBoostClassifier()
+    model.load_model(MODEL_PATH)
+    app.state.model = model
+
 
 class InputData(BaseModel):
     """
@@ -35,7 +46,7 @@ class InputData(BaseModel):
     direction: str
 
 @app.post('/predict')
-def predict(data: InputData):
+def predict(data: InputData, request: Request):
     """
     Эндпоинт для получения предсказания по распознанному номерному знаку.
 
@@ -46,6 +57,7 @@ def predict(data: InputData):
     Returns: dict: Словарь с ключом 'prediction', содержащим список с предсказанным номером.
     Raises: HTTPException: Если при обработке возникает исключение, возвращается статус 500.
     """
+    model = request.app.state.model
     try:
         result = pick_regno(   
         data.regno_recognize,
@@ -58,7 +70,7 @@ def predict(data: InputData):
         data.camera_class,
         data.time_check,
         data.direction,
-        MODEL_PATH
+        model
         )
         return {'prediction': result.tolist()}
     except Exception as e:

@@ -2,7 +2,7 @@ import numpy as np
 import re
 import pandas as pd
 import calendar
-from catboost import CatBoostClassifier
+#from catboost import CatBoostClassifier
 
 ai_sym =['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'D', 'А', 'В', 'Е', 'К', 'М', 'Н', 'О', 'Р', 'С', 'Т', 'У', 'Х']
 old_cyrillic_sym = ['И', 'Й', 'Ц', 'Г', 'Ш', 'Щ', 'З', 'Ъ', 'Ф', 'Ы', 'П', 'Л', 'Д', 'Ж', 'Э', 'Я', 'Ч', 'Ь', 'Б', 'Ю']
@@ -41,6 +41,7 @@ def count_foreign_syms(regno):
     for s in regno:
         if s not in (ai_sym + old_cyrillic_sym + lat_sym):
             i += 1
+    return i
 
 def str_to_list(s):
     if s != '[]':
@@ -89,9 +90,10 @@ def pick_regno(camera_regno, nn_regno, camera_score, nn_score, nn_sym_scores, nn
     
     x.update(letters)
     
-    model = CatBoostClassifier()
-    model.load_model(model_name)
-    y = model.predict_proba(pd.Series(x)[model.feature_names_])
+    # model = CatBoostClassifier()
+    # model.load_model(model_name)
+    # y = model.predict_proba(pd.Series(x)[model.feature_names_])
+    y = model_name.predict_proba(pd.Series(x)[model_name.feature_names_])
     
     return y
 
