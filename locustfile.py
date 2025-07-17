@@ -1,7 +1,16 @@
 from locust import HttpUser, task, between
 import json
 
+
 class APITestUser(HttpUser):
+    """
+    Класс для нагрузочного тестирования API с помощью Locust.
+
+    Имитирует отправку POST-запросов к эндпоинту `/predict`
+    с заданным JSON, представляющим данные о распознавании автомобильного номера.
+
+    Атрибуты: wait_time (function): Время ожидания между запросами. 
+    """
     wait_time = between(0.01, 0.1)  
 
     @task
